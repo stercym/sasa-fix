@@ -67,6 +67,7 @@ export default function Home() {
               <option value="Thika">Thika</option>
               <option value="Kisumu">Kisumu</option>
               <option value="Mombasa">Mombasa</option>
+              <option value="Other">Other</option>
             </select>
 
             <button
