@@ -18,6 +18,8 @@ function AppRouter() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/pages/Serviceprovider/dashboard" element={<ProviderDashboard />}/>
         <Route path="/about" element={<About />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<CreateAcc />}/>
       </Routes>
     </Router>
   );
