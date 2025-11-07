@@ -1,15 +1,8 @@
-import { useState } from 'react'
-import './App.css'
-function App() {
-  const [count, setCount] = useState(0)
+import Dashboard from "./components/Dashboard/Dashboard";
+import "./App.css";
 
-  return (
-    <>
-      <div>
-        <h1>Sasa fix</h1>
-      </div>
-    </>
-  )
+function App() {
+  return <Dashboard />;
 }
 
-export default App
+export default App;
