@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const UserProfile = ({ user }) => {
+const UserProfile = ({ user, posts = [] }) => {
   const [profilePic, setProfilePic] = useState(null);
 
   const handleImageUpload = (e) => {
@@ -79,11 +79,11 @@ const UserProfile = ({ user }) => {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Posts created</span>
-              <span className="text-gray-900">0</span>
+              <span className="text-gray-900">{posts.length}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Skills offered</span>
-              <span className="text-gray-900">0</span>
+              <span className="text-gray-900">{posts.filter(p => p.type === 'offer').length}</span>
             </div>
           </div>
 
