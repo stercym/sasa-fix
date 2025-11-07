@@ -1,15 +1,9 @@
-import { useState } from 'react'
-import './App.css'
-function App() {
-  const [count, setCount] = useState(0)
+// src/App.jsx
+import "./App.css";
+import AppRouter from "./routes/AppRouter";
 
-  return (
-    <>
-      <div>
-        <h1>Sasa fix</h1>
-      </div>
-    </>
-  )
+function App() {
+  return <AppRouter />;
 }
 
-export default App
+export default App;
