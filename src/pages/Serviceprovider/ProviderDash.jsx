@@ -1,102 +1,171 @@
-// src/pages/ProviderDashboard.jsx
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Bell, PlusCircle } from "lucide-react";
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export default function ProviderDashboard() {
-  const navigate = useNavigate();
-  const [provider, setProvider] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [skills, setSkills] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [showSkillModal, setShowSkillModal] = useState(false);
+  const [showNotifModal, setShowNotifModal] = useState(false);
+  const [newSkill, setNewSkill] = useState({ name: "", description: "", level: "Beginner" });
 
-  // For MVP, simulate a logged-in provider
-  const providerId = 1; // This will later come from JWT or context
-
+  // Load data
   useEffect(() => {
-    const fetchProvider = async () => {
-      try {
-        const res = await fetch(`http://127.0.0.1:5000/providers/${providerId}`);
-        const data = await res.json();
-        setProvider(data);
-      } catch (error) {
-        console.error("Failed to load provider:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProvider();
-  }, [providerId]);
+    fetchSkills();
+    fetchNotifications();
+  }, []);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-gray-600 text-lg">Loading your dashboard...</p>
-      </div>
-    );
-  }
+  const fetchSkills = async () => {
+    const { data } = await axios.get(`${API_BASE}/api/skills`);
+    setSkills(data);
+  };
 
-  if (!provider) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-red-600 text-lg">Provider not found.</p>
-      </div>
-    );
-  }
+  const fetchNotifications = async () => {
+    const { data } = await axios.get(`${API_BASE}/api/notifications`);
+    setNotifications(data);
+  };
+
+  const handleAddSkill = async () => {
+    await axios.post(`${API_BASE}/api/skills`, newSkill);
+    setShowSkillModal(false);
+    fetchSkills();
+  };
+
+  const handleMarkAsRead = async (id) => {
+    await axios.patch(`${API_BASE}/api/notifications/${id}`, { is_read: true });
+    fetchNotifications();
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      {/* Header */}
-      <header className="flex justify-between items-center mb-10">
-        <h1 className="text-3xl font-bold text-gray-800">Welcome, {provider.name}</h1>
+    <div className="p-6 min-h-screen bg-gray-50">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Service Provider Dashboard</h1>
+
         <button
-          onClick={() => navigate("/")}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          onClick={() => setShowNotifModal(true)}
+          className="relative bg-white p-3 rounded-full shadow hover:shadow-md"
         >
-          Back to Home
-        </button>
-      </header>
-
-      {/* Profile Overview */}
-      <section className="bg-white shadow rounded-lg p-6 mb-10">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700">Your Profile</h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <p><span className="font-semibold text-gray-600">Name:</span> {provider.name}</p>
-            <p><span className="font-semibold text-gray-600">Service Type:</span> {provider.service_type}</p>
-            <p><span className="font-semibold text-gray-600">Location:</span> {provider.location}</p>
-          </div>
-          <div>
-            <p><span className="font-semibold text-gray-600">Phone:</span> {provider.phone}</p>
-            <p><span className="font-semibold text-gray-600">Rating:</span> ⭐ {provider.rating?.toFixed(1) || "No ratings yet"}</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Recent Reviews */}
-      <section className="bg-white shadow rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700">Recent Reviews</h2>
-        {provider.reviews && provider.reviews.length > 0 ? (
-          <div className="space-y-4">
-            {provider.reviews.map((review, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-4">
-                <p className="text-gray-800 font-medium">⭐ {review.rating}/5</p>
-                <p className="text-gray-600 italic">"{review.comment}"</p>
-                <p className="text-sm text-gray-400 mt-1">— {review.user_name || "Anonymous"}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-500 italic">You haven’t received any reviews yet.</p>
-        )}
-      </section>
-
-      {/* Edit Button (future feature) */}
-      <div className="text-center mt-12">
-        <button
-          className="border border-blue-600 text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition"
-          disabled
-        >
-          ✏️ Edit Profile (Coming Soon)
+          <Bell className="w-6 h-6 text-blue-600" />
+          {notifications.some(n => !n.is_read) && (
+            <span className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+              {notifications.filter(n => !n.is_read).length}
+            </span>
+          )}
         </button>
       </div>
+
+      {/* Skills Section */}
+      <div className="bg-white rounded-xl shadow p-6 mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">My Skills</h2>
+          <button
+            onClick={() => setShowSkillModal(true)}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          >
+            <PlusCircle className="w-4 h-4" /> Add Skill
+          </button>
+        </div>
+
+        {skills.length === 0 ? (
+          <p className="text-gray-500">No skills added yet.</p>
+        ) : (
+          <ul className="space-y-3">
+            {skills.map((s) => (
+              <li key={s.id} className="border-b pb-2">
+                <strong>{s.name}</strong> — {s.level}
+                <p className="text-sm text-gray-600">{s.description}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Add Skill Modal */}
+      {showSkillModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white p-6 rounded-xl w-96">
+            <h3 className="text-xl font-semibold mb-4">Add New Skill</h3>
+            <input
+              type="text"
+              placeholder="Skill Name"
+              value={newSkill.name}
+              onChange={(e) => setNewSkill({ ...newSkill, name: e.target.value })}
+              className="w-full border p-2 rounded mb-3"
+            />
+            <textarea
+              placeholder="Description"
+              value={newSkill.description}
+              onChange={(e) => setNewSkill({ ...newSkill, description: e.target.value })}
+              className="w-full border p-2 rounded mb-3"
+            ></textarea>
+            <select
+              value={newSkill.level}
+              onChange={(e) => setNewSkill({ ...newSkill, level: e.target.value })}
+              className="w-full border p-2 rounded mb-4"
+            >
+              <option>Beginner</option>
+              <option>Intermediate</option>
+              <option>Expert</option>
+            </select>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowSkillModal(false)}
+                className="px-4 py-2 bg-gray-200 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddSkill}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notifications Modal */}
+      {showNotifModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white p-6 rounded-xl w-96 max-h-[80vh] overflow-y-auto">
+            <h3 className="text-xl font-semibold mb-4">Notifications</h3>
+            {notifications.length === 0 ? (
+              <p className="text-gray-500">No notifications yet.</p>
+            ) : (
+              notifications.map((n) => (
+                <div
+                  key={n.id}
+                  className={`border p-3 rounded mb-3 ${!n.is_read ? "bg-blue-50" : ""}`}
+                >
+                  <p>{n.message}</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-xs text-gray-500">
+                      From: {n.client_name}
+                    </span>
+                    {!n.is_read && (
+                      <button
+                        onClick={() => handleMarkAsRead(n.id)}
+                        className="text-blue-600 text-sm hover:underline"
+                      >
+                        Mark as Read
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+            <button
+              onClick={() => setShowNotifModal(false)}
+              className="mt-4 px-4 py-2 bg-gray-200 rounded w-full"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
