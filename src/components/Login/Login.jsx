@@ -22,7 +22,14 @@ const Login = () => {
       if (response.ok) {
         localStorage.setItem('token', data.access_token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        alert('Login successful!');
+        
+        // Navigate based on user role
+        const userRole = data.user.role || 'client';
+        if (userRole === 'provider') {
+          window.location.href = '/pages/Serviceprovider/dashboard';
+        } else {
+          window.location.href = '/dashboard';
+        }
       } else {
         setStatus(data.error || 'Login failed');
       }

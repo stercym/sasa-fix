@@ -5,7 +5,8 @@ import * as Yup from 'yup';
 const validationSchema = Yup.object({
   name: Yup.string().min(2, 'Name must be at least 2 characters').required('Name is required'),
   email: Yup.string().email('Invalid email').required('Email is required'),
-  password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required')
+  password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+  role: Yup.string().oneOf(['client', 'provider'], 'Please select a role').required('Role is required')
 });
 
 const CreateAcc = () => {
@@ -53,7 +54,7 @@ const CreateAcc = () => {
           </div>
         ) : (
           <Formik
-            initialValues={{ name: '', email: '', password: '' }}
+            initialValues={{ name: '', email: '', password: '', role: '' }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
@@ -90,6 +91,19 @@ const CreateAcc = () => {
                       disabled={isSubmitting}
                     />
                     <ErrorMessage name="password" component="div" className="text-red-600 text-sm mt-1" />
+                  </div>
+                  <div>
+                    <Field
+                      as="select"
+                      name="role"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Select your role</option>
+                      <option value="client">Client (Looking for services)</option>
+                      <option value="provider">Service Provider</option>
+                    </Field>
+                    <ErrorMessage name="role" component="div" className="text-red-600 text-sm mt-1" />
                   </div>
                 </div>
                 <button

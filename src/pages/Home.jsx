@@ -24,6 +24,22 @@ export default function Home() {
             Connect instantly with verified mechanics, plumbers, electricians, and more —
             anywhere in Kenya.
           </p>
+          
+          {/* Auth Buttons */}
+          <div className="flex gap-4 justify-center mb-8">
+            <button
+              onClick={() => navigate('/login')}
+              className="bg-white text-blue-600 px-6 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200 font-medium"
+            >
+              Login
+            </button>
+            <button
+              onClick={() => navigate('/register')}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium border border-white"
+            >
+              Sign Up
+            </button>
+          </div>
 
           {/* Search Form */}
           <div className="flex flex-col md:flex-row items-center justify-center gap-4">
